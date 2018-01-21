@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+                          
+      <var name="user" class="org.vortexnepal.webflow.model.User" />
+      <var name="userInfo" class="org.vortexnepal.webflow.model.UserInfo" />
+      
+      <action-state id="addUserInfoToUser">
+      	<evaluate expression="registerHandler.init()" result="user.userInfo" />
+      	<transition to="personal" />
+      </action-state>
+      
+      <!-- Start State -->
+      <view-state id="personal" view="flows/register/signup-personal" model="user">
+      	<transition on="billing" to="billing"></transition>
+      </view-state>
+      <view-state id="billing" view="flows/register/signup-billing" model="user">
+      	<transition on="personal" to="personal"></transition>
+      	<transition on="confirm" to="confirm"></transition>
+      	
+      </view-state>
+      <view-state id="confirm" view="flows/register/signup-confirm" model="user">
+      	<transition on="personal" to="personal"></transition>
+      	<transition on="billing" to="billing"></transition>
+      	<transition on="success" to="registerConfirmed"></transition>
+      	
+      </view-state>
+      
+      <action-state id="registerConfirmed"> 
+		<evaluate expression="userService.save(user)"></evaluate>
+		<transition to="success"/>
+	  </action-state>
+      	
+      <!-- End State -->
+      <end-state id="index" view="externalRedirect:contextRelative:/"/>
+      <end-state id="success" view="flows/register/signup-success" />	
+      
+	  <!--Global transition -->
+	  <global-transitions>
+	  	<transition on="index" to="index"/>
+	  </global-transitions>
+</flow>
